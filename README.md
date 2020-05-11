@@ -1,4 +1,1 @@
 # Homemade ANPR Application
-
-==================================
-
