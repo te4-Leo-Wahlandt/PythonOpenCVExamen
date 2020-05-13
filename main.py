@@ -25,7 +25,6 @@ currentFrame = 0
 #Run program: python3 OCR.py
 while(True): 
     ret, video = cap.read()
-
     cv2.imshow('video', video)
 
     videoText = pytesseract.image_to_string(video, lang ='eng')
