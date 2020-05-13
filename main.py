@@ -5,10 +5,8 @@ from PIL import Image
 import os
 import re
 from scrapper import CheckifPolice
-
-
 import time
-
+#import RPi.GPIO as GPIO 
 
 cap = cv2.VideoCapture(0)
 try: 
@@ -20,10 +18,23 @@ except OSError:
 
 currentFrame = 0
 
+#The LED response
+#GPIO.setmode(GPIO.BCM)
+#Green light
+#GPIO.setup(26, GPIO.OUT)
+#red light
+#GPIO.setup(6, GPIO.OUT)
+
+
 #This code will be able to load in the source code for the biluppgifter homepage
-#new branch
+
 #Run program: python3 OCR.py
 while(True): 
+
+    #reset the GPIO
+    #GPIO.setup(6, False)
+    #GPIO.setup(26, False)
+
     ret, video = cap.read()
     cv2.imshow('video', video)
 
