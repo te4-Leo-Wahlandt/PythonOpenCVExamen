@@ -1,41 +1,35 @@
-import urllib.request
+import requests
 import re
-#import RPi.GPIO as GPIO
+from bs4 import BeautifulSoup
+from urllib.parse import unquote
+import RPi.GPIO as GPIO
 
-#The LED response
-#GPIO.setmode(GPIO.BCM)
-#Green light
-#GPIO.setup(26, GPIO.OUT)
-#red light
-#GPIO.setup(6, GPIO.OUT)
-
-
+baseURL = 'https://biluppgifter.se/fordon/'
 def CheckifPolice(result):
-    #reset the GPIO
-    #GPIO.setup(6, False)
-    #GPIO.setup(26, False)
-
-    user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-    url = "https://biluppgifter.se/fordon/OYC087"
-    
-    headers={'User-Agent':user_agent,} 
-    
-    request = urllib.request.Request(url,None,headers) #The assembled request
-    response = urllib.request.urlopen(request)
-
-    data = response.read().decode('UTF-8') # The data u need
-
-    print(data)
-
-    #Refactor the data so it won't fetch all data. Only need a specific div
-
-    regex = re.findall(r'POLIS', str(data))
-    PoliceInstance = len(regex)
-    print(PoliceInstance)
-
-    if(PoliceInstance >= 1):
-        print("Kan vara polis")
-        #GPIO.setup(6, True)
+    r = requests.get(baseURL+result)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    if(soup.find_all('div', {'class': 'alert alert-danger text-center'})):
+        print("Polis")
+        GPIO.setup(6, True)
     else:
-        print("Är inte polis")
-        #GPIO.setup(26, True)
+        print("Ingen Polis")
+        getInfo = soup.find('a', {'class': 'gtm-merinfo'})
+        href = getInfo['href']
+        getDriver(href)
+        GPIO.setup(26, True)
+    
+
+def getDriver(getInfo):
+    splitURL = getInfo.split('/')
+    if(splitURL[3] == 'foretag'):
+        print("Ägs av företaget: " + splitURL[4])
+    else:
+        nameAndYear = splitURL[5].split('-')
+        fullName = ""
+        for name in nameAndYear[0:-1]:
+            fullName += name + " "
+
+        year = nameAndYear[-1]
+        print(fullName)
+        print(year)
+CheckifPolice('AAS23A')

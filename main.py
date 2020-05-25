@@ -5,10 +5,8 @@ from PIL import Image
 import os
 import re
 from scrapper import CheckifPolice
-
-
 import time
-
+import RPi.GPIO as GPIO 
 
 cap = cv2.VideoCapture(0)
 try: 
@@ -19,13 +17,25 @@ except OSError:
     print('Error Creating directory of data')
 
 currentFrame = 0
+#The LED response
+#GPIO.setmode(GPIO.BCM)
+#Green light
+if(GPIO.setup(26, GPIO.OUT) == False):
+    GPIO.setup(26, GPIO.OUT)
+#red light
+if(GPIO.setup(6, GPIO.OUT) == False):
+    GPIO.setup(6, GPIO.OUT)
 
 #This code will be able to load in the source code for the biluppgifter homepage
 
 #Run program: python3 OCR.py
 while(True): 
-    ret, video = cap.read()
 
+    #reset the GPIO
+    GPIO.setup(6, False)
+    GPIO.setup(26, False)
+
+    ret, video = cap.read()
     cv2.imshow('video', video)
 
     videoText = pytesseract.image_to_string(video, lang ='eng')
